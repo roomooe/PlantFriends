@@ -74,14 +74,14 @@ int VoltageADC;
 
 
 // LED Pin
-#define led 6
+#define led 9
 
 
 // RADIO SETTINGS
 // You will need to initialize the radio by telling it what ID it has and what network it's on
 // The NodeID takes values from 1-127, 0 is reserved for sending broadcast messages (send to all nodes)
 // The Network ID takes values from 0-255
-#define NODEID       2  // The ID of this node. Has to be unique. 1 is reserved for the gateway!
+#define NODEID       3  // The ID of this node. Has to be unique. 1 is reserved for the gateway!
 #define NETWORKID    20  //the network ID we are on
 #define GATEWAYID     1  //the gateway Moteino ID (default is 1)
 #define ACK_TIME     2800  // # of ms to wait for an ack
@@ -89,7 +89,7 @@ int VoltageADC;
 #define FREQUENCY   RF69_433MHZ
 //#define FREQUENCY   RF69_868MHZ
 //#define FREQUENCY     RF69_915MHZ
-#define ENCRYPTKEY    "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
+// #define ENCRYPTKEY    "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
 
 
 
@@ -134,7 +134,7 @@ void setup()
    
   // Initialize the radio
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
-  radio.encrypt(ENCRYPTKEY);
+  // radio.encrypt(ENCRYPTKEY);
   radio.sleep(); //sleep right away to save power
   
 }
@@ -224,7 +224,7 @@ void loop()
   
     
   //Transmit the data
-  LEDPulse (); // pulse the LED
+   // pulse the LED
   if (radio.sendWithRetry(GATEWAYID, sendBuf, sendSize)) // send the data
  {
     Serial.println(" ok!");
@@ -232,6 +232,7 @@ void loop()
  }else {
         //ack not recieved
 		Serial.println(" nothing...");
+        LEDPulse ();
         sleepCYCLE = sleepCYCLE / 2; // since we didnt recieve ack, halve sleep cycle
       }
  

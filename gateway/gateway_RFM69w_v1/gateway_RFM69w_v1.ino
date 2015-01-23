@@ -34,11 +34,13 @@ http://opensource.org/licenses/mit-license.php
 #define NODEID  1  // Node ID used for this unit. 1 is reserved for gateway
 #define NETWORKID  20  //the network ID we are on
 #define FREQUENCY     RF69_433MHZ
-#define ENCRYPTKEY    "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
+// #define ENCRYPTKEY    "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
 
 RFM69 radio;
 
-int LedPin = 5;
+int LedPin = 9;
+
+bool promiscuousMode = false; //set to 'true' to sniff all packets on the same network
 
 void setup() {
   
@@ -53,8 +55,8 @@ void setup() {
   
   // initialize radio
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
-  radio.encrypt(ENCRYPTKEY);
-  radio.promiscuous(false);
+ // radio.encrypt(ENCRYPTKEY);
+  radio.promiscuous(promiscuousMode);
 
 }
 
@@ -64,7 +66,7 @@ void loop() {
   int datalen;
   char charbuf;
   
-  LEDPulse();
+//  LEDPulse();
   
   if (radio.receiveDone()) // radio finishes recieving data
   {
