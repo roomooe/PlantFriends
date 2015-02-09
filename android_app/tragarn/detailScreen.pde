@@ -133,28 +133,28 @@ void detailScreen() {
 
   // soil moist data
   textFont(fontlit,46*heightStretch*1.5);
-  nName = NodeDetail[NodeIdex][dataDay][2];
+  nName = NodeDetail[NodeIdex][dataDay][2]+ " %";
   nName = nName.toUpperCase();
   text(nName, dMargin, 204*heightStretch);
     
     
     
   // humid data
-  nName = NodeDetail[NodeIdex][dataDay][4] + "%";
+  nName = NodeDetail[NodeIdex][dataDay][4] + " %";
   text(nName, dMargin, (204+74)*heightStretch);
 
   // toggle temperature C or F
   if (tempToggle) { 
     nName = nf((float(NodeDetail[NodeIdex][dataDay][3])*9/5+32),2,1) + "\u00baF";
   } else { 
-    nName = NodeDetail[NodeIdex][dataDay][3] + "\u00baC";
+    nName = NodeDetail[NodeIdex][dataDay][3] + " \u00baC";
   }
     
   // warmth data
   text(nName, dMargin, (204+74+74)*heightStretch);
   
   // battery data
-  nName = nf(float(NodeDetail[NodeIdex][dataDay][5]),1,2) + "%";
+  nName = nf(float(NodeDetail[NodeIdex][dataDay][5]),1,2) + " %";
   text(nName, dMargin, (204+74+74+74)*heightStretch);
 
   // color legend
@@ -199,10 +199,10 @@ void detailScreen() {
   // draw dates in as M/dd on graph 
   pushMatrix();
   translate(gMargin,0);
-  nName = "Ingen Data";
+  nName = "No Data";
   String[] dateGx;
   for ( int i = 0 ; i < 6 ; i++ ) {
-    if ( NodeDetail[NodeIdex][i][0].equals("Ingen Data") == false) {
+    if ( NodeDetail[NodeIdex][i][0].equals("No Data") == false) {
       dateGx = split(NodeDetail[NodeIdex][i][0],'-');
       dateGx[0] = dateGx[0].substring(0,3);
       dateGx[1] = dateGx[1].substring(0,2);
@@ -210,8 +210,8 @@ void detailScreen() {
       dateGx[1] = dateGx[1].replace("t","");
       nName = dateGx[0] + " " + dateGx[1];
         if ( i == 0 ) { nName = "NU"; }
-    } else { nName = "Ingen Data"; }
-    text(nName, gspace*i, 44*heightStretch);
+    } else { nName = "No Data"; }
+    text(nName, gspace*i+7, 44*heightStretch);
   }
   
 

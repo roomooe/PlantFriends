@@ -55,7 +55,7 @@ import ketai.ui.*;
 KetaiGesture gesture;
 
 // Server settings. Change IP address or hostname accordingly.
- static final String NodeIndexURL = "http://192.168.1.86";
+ static final String NodeIndexURL = "http://goatee.no-ip.org";
 
 
 // for accessing node specific data

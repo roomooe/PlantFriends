@@ -48,7 +48,7 @@ void kurbits (float posx, float posy, float srotate, float sscale, color scolor,
   ellipse(0,0,18,15);
   ellipse(0,0,15,18);
   stroke(fill);
-  strokeWeight(2);
+  strokeWeight(1.7);
   line(-16,16,16,-16);
   line(16,16,-16,-16);
   noStroke();
