@@ -20,7 +20,7 @@ void nodeScreen() {
   noStroke();
   rectMode(CORNERS);
 
-  fill(greengrass);
+  fill(lightblue);
   rect(0,0,width,headerBoxH);
   image(logohead, 18*widthStretch, 12*heightStretch, 366*widthStretch, 210*heightStretch);
   

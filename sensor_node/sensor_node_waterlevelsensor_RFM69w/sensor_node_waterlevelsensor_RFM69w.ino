@@ -64,13 +64,14 @@ Soil Moisture Chart
 DHT dht(DHTPIN, DHTTYPE); // define DHT11
 
 
-// Battery meter 
-#define VoltagePinRead A7 // analogue voltage read pin for batery meter
-#define VoltagePinEnable A3 // current sink pin. ( enable voltage divider )
-#define VoltageRef 3.3 // reference voltage on system. use to calculate voltage from ADC
+// Water level meter 
+#define trigPin 8 // analogue voltage read pin for batery meter
+#define echoPin 9 // current sink pin. ( enable voltage divider )
 #define VoltageDivider 2 // if you have a voltage divider to read voltages, enter the multiplier here.
-int VoltageLow = 4; // low battery threshhold. 4 volts.
-int VoltageADC;
+
+//Water pump pin
+#define waterPumpPin 10
+
 
 
 // LED Pin
@@ -94,9 +95,9 @@ int VoltageADC;
 
 
 // Power Management Sleep cycles
-int sleepCycledefault = 4; // Sleep cycle 450*8 seconds = 1 hour. DEFAULT 450
+int sleepCycledefault = 1; // Sleep cycle 450*8 seconds = 1 hour. DEFAULT 450
 int soilMoistThresh = 250; // soil moisture threshold. reference chart
-
+long minWaterLevel = 21; // Water level threshold, dependant on water tank
 
 String senseDATA; // sensor data STRING
 String ErrorLvl = "0"; // Error level. 0 = normal. 1 = soil moisture, 2 = Temperature , 3 = Humidity, 4 = Battery voltage
@@ -115,9 +116,13 @@ void setup()
   //LED setup. 
   pinMode(led, OUTPUT);
   
-  // Battery Meter setup
-  pinMode(VoltagePinRead, INPUT);
-  pinMode(VoltagePinEnable, INPUT);
+  // Water Meter setup
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  
+  // Water pump setup
+  pinMode(waterPumpPin, OUTPUT);
+  digitalWrite(waterPumpPin, LOW);
  
   // Moisture sensor pin setup
   pinMode(moistPIN1, OUTPUT);
@@ -139,46 +144,50 @@ void setup()
   
 }
 
-
-
 void loop()
 {
   
+  int distance;
+  int moistREADavg;
   int sleepCYCLE = sleepCycledefault; // Sleep cycle reset
   ErrorLvl = "0"; // Reset error level
   
+  delay(5000);
   
-  // Battery level check
-  pinMode(VoltagePinEnable, OUTPUT); // change pin mode
-  digitalWrite(VoltagePinEnable, LOW); // turn on the battery meter (sink current)
-  for ( int i = 0 ; i < 3 ; i++ ) {
-    delay(48); // delay, wait for circuit to stabalize
-    VoltageADC = analogRead(VoltagePinRead); // read the voltage 3 times. keep last reading
-  }
-  float Voltage = ((VoltageADC * VoltageRef) / 1023) * VoltageDivider; // calculate the voltage
-  if (Voltage < VoltageLow){
-    ErrorLvl = "4"; // assign error level
-  }
-  pinMode(VoltagePinEnable, INPUT); // turn off the battery meter
-  
+  // Water level check
+  distance = waterLevelREAD();
   
   // Soil Moisture sensor reading
-  int moistREADavg = 0; // reset the moisture level before reading
-  int moistCycle = 3; // how many times to read the moisture level. default is 3 times
-  for ( int moistReadCount = 0; moistReadCount < moistCycle; moistReadCount++ ) {
-    moistREADavg += moistREAD();
-  }
-  moistREADavg = moistREADavg / moistCycle; // average the results
-  Serial.print("Soil Moisture: ");
-  Serial.println(moistREADavg);
+  moistREADavg = moistREAD();
   
+    // Turn on waterpump if there is water in tank and soil moisture is low
+  while ( moistREADavg < soilMoistThresh && distance < minWaterLevel && distance != 0 ){
+    watering();
+    moistREADavg = moistREAD();  // update soil moisture and distance after watering in case tank is empty.
+    distance = waterLevelREAD();
+  }
+    
+  // if water level is below threshold assign error level
+  if (distance > minWaterLevel){
+    ErrorLvl = "4"; 
+    LEDBlink(128);
+    LEDBlink(128);
+    LEDBlink(128);
+  }
+    
+  if (distance == 0){
+    ErrorLvl = "5"; 
+    LEDBlink(128);
+    LEDBlink(128);
+    LEDBlink(128);
+  }
   
   // if soil is below threshold, error level 1
   if ( moistREADavg < soilMoistThresh ) {
     ErrorLvl += "1"; // assign error level
-      LEDBlink(128);
-      LEDBlink(128);
-      LEDBlink(128);
+    LEDBlink(128);
+    LEDBlink(128);
+    LEDBlink(128);
   }
     
     
@@ -213,9 +222,10 @@ void loop()
   senseDATA += ":";
   senseDATA += String(dhthumid);
   senseDATA += ":";
-  char VoltagebufTemp[10];
-  dtostrf(Voltage,5,3,VoltagebufTemp); // convert float Voltage to string
-  senseDATA += VoltagebufTemp;
+  senseDATA += String(distance);
+  //char VoltagebufTemp[10];
+ // dtostrf(distance,5,3,VoltagebufTemp); // convert float Voltage to string
+ // senseDATA += VoltagebufTemp;
   byte sendSize = senseDATA.length();
   sendSize = sendSize + 1;
   char sendBuf[sendSize];
@@ -245,7 +255,7 @@ void loop()
   // Error Level handing
   // If any error level is generated, halve the sleep cycle
   if ( ErrorLvl.toInt() > 0 ) {
-    sleepCYCLE = sleepCYCLE / 2;
+    // sleepCYCLE = sleepCYCLE / 2;
     LEDBlink(30);
     LEDBlink(30);
     LEDBlink(30);
@@ -276,6 +286,18 @@ void LEDBlink(int DELAY_MS)
   delay(DELAY_MS);
 }
 
+// Watering function
+void watering () {
+
+
+    digitalWrite(waterPumpPin, HIGH);
+    delay(1000);
+    digitalWrite(waterPumpPin, LOW);
+    delay(1000);
+    
+    
+    
+  }
 
 
 // LED Pulse function
@@ -296,32 +318,61 @@ void LEDPulse() {
 }
 
 
+int waterLevelREAD() {
+  long duration;
+  int distance = 0; // reset distance before read
+  digitalWrite(trigPin, LOW);  
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10); 
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance =+ (duration/2) / 29.1;
+  digitalWrite(trigPin, LOW); // reset the water meter
+  Serial.print("Water level: ");
+  Serial.println(distance);
+
+  return distance;
+  
+}
 
 // Moisture sensor reading function
-// function reads 3 times and averages the data
+
 int moistREAD() {
-  int moistREADdelay = 88; // delay to reduce capacitive effects
-  int moistAVG = 0;
-  // polarity 1 read
-  digitalWrite(moistPIN1, HIGH);
-  digitalWrite(moistPIN2, LOW);
-  delay (moistREADdelay);
-  int moistVal1 = analogRead(moistREADPIN1);
-  Serial.println(moistVal1);
-  digitalWrite(moistPIN1, LOW);
-  delay (moistREADdelay);
-  // polarity 2 read
-  digitalWrite(moistPIN1, LOW);
-  digitalWrite(moistPIN2, HIGH);
-  delay (moistREADdelay);
-  int moistVal2 = analogRead(moistREADPIN1);
-  //Make sure all the pins are off to save power
-  digitalWrite(moistPIN2, LOW);
-  digitalWrite(moistPIN1, LOW);
-  moistVal1 = 1023 - moistVal1; // invert the reading
-  Serial.println(moistVal2);
-  moistAVG = (moistVal1 + moistVal2) / 2; // average readings. report the levels
-  return moistAVG;
+  
+  int moistCycle = 3; // how many times to read the moisture level. default is 3 times
+  int moistREADavg = 0; // reset the moisture level before reading
+
+  
+  for ( int moistReadCount = 0; moistReadCount < moistCycle; moistReadCount++ ) {
+  
+    int moistAVG = 0; // reset before reading
+    int moistREADdelay = 88; // delay to reduce capacitive effects
+    // polarity 1 read
+    digitalWrite(moistPIN1, HIGH);
+    digitalWrite(moistPIN2, LOW);
+    delay (moistREADdelay);
+    int moistVal1 = analogRead(moistREADPIN1);
+    Serial.println(moistVal1);
+    digitalWrite(moistPIN1, LOW);
+    delay (moistREADdelay);
+    // polarity 2 read
+    digitalWrite(moistPIN1, LOW);
+    digitalWrite(moistPIN2, HIGH);
+    delay (moistREADdelay);
+    int moistVal2 = analogRead(moistREADPIN1);
+    //Make sure all the pins are off to save power
+    digitalWrite(moistPIN2, LOW);
+    digitalWrite(moistPIN1, LOW);
+    moistVal1 = 1023 - moistVal1; // invert the reading
+    Serial.println(moistVal2);
+    moistAVG = (moistVal1 + moistVal2) / 2; // average readings. report the levels
+    moistREADavg += moistAVG;
+  }
+  moistREADavg = moistREADavg / moistCycle; // average the results
+  Serial.print("Soil Moisture: ");
+  Serial.println(moistREADavg);
+  return moistREADavg;
 }
 
 

@@ -41,16 +41,16 @@ import MySQLdb as mdb # interact with MySQL
 
 
 # Declare database variables. Change accordingly
-con = mdb.connect('localhost', 'plantuser', 'password', 'plantfriendsdb');
+con = mdb.connect('localhost', 'plantuser', 'redhammerbatterystapler', 'plantfriendsdb');
 
 
 # Information for email. This will be used by the Plant Friends system to send out emails.
-emailaddr = 'sent_from@emailaddress.here'
-emailpass = 'smtp_password'
+emailaddr = 'EMAILOFSYSTEM@ADRESS.COM'
+emailpass = 'PASSWORD'
 
 
 # These are email address that you want to send alerts TO. Email addresses are stored in an array.
-emailList = ['personal_email@address.com','friends_email@address.com','PHONENUMBER@yourMobileCarrier.com']
+emailList = ['EMAILTOSENDNOTFICATIONSTO@ADRESS.COM']
 
 
 # Delare serial port settings
@@ -67,12 +67,16 @@ def alertMail(msg):
 			"",
 			msg + "\r\nK. thanks.\r\n\r\n- %s" % Alias,
 			), "\r\n")
+	try:
 		server = smtplib.SMTP('smtp.gmail.com:587') # Gmail SMTP server address
 		server.ehlo()
 		server.starttls()
 		server.login(emailaddr, emailpass)
 		server.sendmail(Alias, [emaildest], EMAIL_BODY)
-		server.quit()
+		server.close()
+		print 'Yay'
+	except:
+	    print 'Nay'
 
 
 # NodeID Check function. Returns boolean.
@@ -110,6 +114,7 @@ try:
 		
 		# Read the serial buffer.
 		serdata = ser.readline()
+		print serdata
 		
 		
 		# The serial port likes to insert random spaces so we just want the lines ones that actually have data.
@@ -157,39 +162,6 @@ try:
 				TempC = nodedata[3]
 				Humid = nodedata[4]
 				Voltage = nodedata[5]
-			
-			
-				# Check if the sensor node marked an error. Check the type of error. Generate message.
-				if int(ErrorLvl) > 0:
-					
-					# Reset the email message
-					ErrorMsg = " \r\n"
-				
-					# Soil moisture low
-					if "1" in ErrorLvl:
-						SoilMoistErr = "OMG so thirsty. \r\n"
-						ErrorMsg = ErrorMsg + SoilMoistErr
-				
-					# Temperature error
-					if "2" in ErrorLvl:
-						TempCErr = "Temperature ERROR!  \r\n"
-						ErrorMsg = ErrorMsg + TempCErr
-				
-					# Humidity error
-					if "3" in ErrorLvl:
-						HumidErr = "Humidity ERROR!  \r\n"
-						ErrorMsg = ErrorMsg + HumidErr
-				
-					# Battery voltage low
-					if "4" in ErrorLvl:
-						VoltageErr = "Oh nos, we need more POWA!!  \r\n"
-						ErrorMsg = ErrorMsg + VoltageErr
-
-				
-					# Send out email. This gets spawned as a thread so it doesn't block the rest of the program.
-					OhNos = threading.Thread(target=alertMail(ErrorMsg))
-					OhNos.start()
-				
 								
 				# Check if a table for the NodeID exits. If not, create one.
 				tableCheck = "SHOW TABLES LIKE '{}'".format (AliasID)
@@ -218,6 +190,42 @@ try:
 				with con:
 					cur = con.cursor()
 					cur.execute(datasql)
+					
+				# Check if the sensor node marked an error. Check the type of error. Generate message.
+				if int(ErrorLvl) > 0:
+					
+					# Reset the email message
+					ErrorMsg = " \r\n"
+				
+					# Soil moisture low
+					if "1" in ErrorLvl:
+						SoilMoistErr = "OMG so thirsty. \r\n"
+						ErrorMsg = ErrorMsg + SoilMoistErr
+				
+					# Temperature error
+					if "2" in ErrorLvl:
+						TempCErr = "Temperature ERROR!  \r\n"
+						ErrorMsg = ErrorMsg + TempCErr
+				
+					# Humidity error
+					if "3" in ErrorLvl:
+						HumidErr = "Humidity ERROR!  \r\n"
+						ErrorMsg = ErrorMsg + HumidErr
+				
+					# Water level low
+					if "4" in ErrorLvl:
+						VoltageErr = "Oh nos, we need more WATER IN TANK!!  \r\n"
+						ErrorMsg = ErrorMsg + VoltageErr
+
+					# Water level low
+					if "5" in ErrorLvl:
+						VoltageErr = "Water level sensor ERROR!  \r\n"
+						ErrorMsg = ErrorMsg + VoltageErr
+				
+					# Send out email. This gets spawned as a thread so it doesn't block the rest of the program.
+					OhNos = threading.Thread(target=alertMail(ErrorMsg))
+					OhNos.start()
+				
 				
 except KeyboardInterrupt:
 	ser.close()

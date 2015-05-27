@@ -12,7 +12,7 @@
   Edited by Johan Johansson
 
   First release: August 8, 2013
-  Updated: July 26, 2014
+  Updated: July 27, 2015
 
 
   The Plant Friends MKII software, source code, Arduino sketchs and Processing sketches is released under The MIT License.
@@ -55,15 +55,15 @@ import ketai.ui.*;
 KetaiGesture gesture;
 
 // Server settings. Change IP address or hostname accordingly.
- static final String NodeIndexURL = "http://goatee.no-ip.org";
+ static final String NodeIndexURL = "http://IP OF THE RASPBERRY";
 
 
 // for accessing node specific data
 static final String NodeURL = NodeIndexURL + "/index.php?NodeID=";
 
-// Screen resolution of device, uncomment size() in void setup beforerunning on mobile
-float monitorWidth = 540;
-float monitorHeight = 960;
+// Screen resolution of device, comment size() in void setup before running on mobile
+float monitorWidth = 1080;
+float monitorHeight = 1920;
 
 // colours
 color leaf = #099500; // logotype leaf
@@ -81,6 +81,7 @@ color blue = #2989cd; //icon
 color blueskypas = #bff1f2; // humid
 color bluesky = #18d6e7; // humid
 color bluebaby = #63d1fd; // icon
+color lightblue = #2196f3; //
 color teal = #29b8a8; // icon
 color tealpas = #7ce6da; // icon
 color green = #30a526; //icon
@@ -102,24 +103,25 @@ color pinkhot = #ff2a98; //icon
 color pinkmid = #ff93cb; //details screen? test with brightness
 color pink = #ffbcd6; //icon pink proper
 color pinkpurple = #ff65d5; //icon maybe for splash only
-color purple = #b770ff; //icon
-color cyanpas = #ebf8fa; //splash screen background
+color purple = #673ab7; //icon
+color purplepas = #d1c4e9;
+color cyanpas = #e1f5fe; //splash screen background
 color cyan =  #00bcd4;
 color cyanpaspas = #b2ebf2;
 
 // colour pallete for assigning random colours to splash
-color[] pallete = {blue,green,blueskypas,bluebaby,teal,green,greengrass,greenpas,greenlit,yellow,yellowlit,brown,orangelit,orange,orangered,red,pinkhothot,pinkhot,pink,pinkmid,pinkpurple,purple};
+color[] pallete = {cyan,green,bluebaby,teal,green,greengrass,greenpas,yellow,brown,orangelit,orange,orangered,red,pinkhothot,pinkhot,pink,pinkmid,pinkpurple,purple,teal};
 
 // colour pallete for node details and node menu icons
 color[][] palleteNode = {
-{pinkhot,pink},
 {orange,orangelit},
-{greengrass,greenpas},
+{pinkmid,pink},
+{bluebaby,blueskypas},
+{teal,tealpas},
+{pinkhot,pink},
 {cyan,cyanpaspas},
 {yellow,yellowlit},
-{teal,tealpas},
-{bluebaby,blueskypas},
-{pinkmid,pink},
+{greengrass,greenpas},
 };
 
 color[] pastell = {pink,tealpas,orangelit,blueskypas,greenpas,yellowlit,purple};
@@ -214,7 +216,7 @@ float[][] bBoxNode; // bounding box array.  nodeid => x, x, y, y
 
 // global vars for storing data of all nodes
 String[][] NodeIndex; // data format INDEX => NODEID : NODE ALIAS : PLANT NAME : LOCATION : COMMENTS :  NODE ICON ROTATION : NODE ICON COLOR(not used right now)
-String[][][] NodeDetail; // data format INDEX => 0 DATE : 1 ERROR LEVEL : 2 SOIL MOISTURE : 3 TEMPERATURE in C : 4 HUMIDITY : 5 BATTERY VOLTAGE
+String[][][] NodeDetail; // data format INDEX => 0 DATE : 1 ERROR LEVEL : 2 SOIL MOISTURE : 3 TEMPERATURE in C : 4 HUMIDITY : 5 WATER TANK LEVEL
 String NodeID; // the id number of the actual node. relate this to NodeIdex to access all the data in arrays
 int NodeIdex = 0; // see above
 int loadIndexStatus = 0;
@@ -230,7 +232,7 @@ float sum; // count to make sure splah image is done animating itself
 
 void setup() {
   // nexus 4 screen size sans bottom menu bar
- size(540, 960);
+ // size(540, 960);
  
   // the hamburger way
   orientation(PORTRAIT);  
@@ -240,7 +242,7 @@ void setup() {
   
   // Load images
   logosplash = loadImage("logotype_bow.png");
-  logohead = requestImage("logotype_wog.png");
+  logohead = requestImage("logotype_wog_blue.png");
 
   // Generate node icons for splash image. spawns thread
   thread("splashGen");
@@ -248,7 +250,7 @@ void setup() {
   // Loads the NodeIndex. Spawns thread.
   thread("loadNodeIndex");
 
-  // Alternate font set. from google, safe to distribute
+  // Alternate font set., safe to use for non-commercial applications
   fontmed = createFont("Penelope-Anne.ttf", 50*(widthStretch+heightStretch)*0.5, true);
   fontreg = createFont("Penelope-Anne.ttf", 72*(widthStretch+heightStretch)*0.5, true);
   fontlit = createFont("Penelope-Anne.ttf", 48*(widthStretch+heightStretch)*0.5, true);//

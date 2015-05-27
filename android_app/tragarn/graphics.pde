@@ -21,7 +21,8 @@ void nodeIcon(float posx, float posy, float srotate, float sscale, color scolor)
   popMatrix();
   popMatrix();
 }
-
+// Draw kurbits node icon
+// x,y,rotate,scale,color
 void kurbits (float posx, float posy, float srotate, float sscale, color scolor, color fill, color pistill){
   pushMatrix();
 
@@ -62,7 +63,7 @@ void kurbits (float posx, float posy, float srotate, float sscale, color scolor,
 }
 
 
-// flower sketch
+// flower sketch, not used
 // x,y,rotate,scale,color
 void flower(float posx, float posy, float srotate, float sscale, color scolor) {
 

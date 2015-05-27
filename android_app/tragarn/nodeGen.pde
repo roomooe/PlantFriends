@@ -92,11 +92,11 @@ class NodeBox {
     float mPad = 4*widthStretch;
     float vOffset = 0;
 
-    // soil moist. scale is mapped to 0 - 600 ADC value
-    fill(brownlit);
+    // soil moist. scale is mapped to 0 - 800 ADC value
+    fill(greenpas);
     rect(0,0,mGw,90*heightStretch);
-    vOffset = constrain(map(tempSoilx,0,600,90*heightStretch,0),0,90*heightStretch);
-    fill(brown);
+    vOffset = constrain(map(tempSoilx,200,800,90*heightStretch,0),0,90*heightStretch);
+    fill(green);
     rect(0,vOffset,mGw,90*heightStretch);
     
     // humid. scale mapped to 0 - 90%
@@ -115,10 +115,10 @@ class NodeBox {
     
     
     //batt. mapped to 3 - 6v
-    fill(yellowlit);
+    fill(brownlit);
     rect(mGw*3+mPad*3,0,mGw*4+mPad*3,90*heightStretch);
-    vOffset = constrain(map(tempVoltx,3.3,6,90*heightStretch,0),0,90*heightStretch);
-    fill(yellow);
+    vOffset = constrain(map(tempVoltx,24,3,90*heightStretch,0),0,90*heightStretch);
+    fill(brown);
     rect(mGw*3+mPad*3,vOffset,mGw*4+mPad*3,90*heightStretch);
 
     popMatrix();

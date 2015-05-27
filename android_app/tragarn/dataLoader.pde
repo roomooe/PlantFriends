@@ -1,5 +1,3 @@
-
-
 // Loads the NodeIndex and NodeDetails
 // connects to raspi to grab all the sensor node data and dumps into arrays
 

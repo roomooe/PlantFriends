@@ -32,5 +32,5 @@
 // Database variables
 define('DB_HOST', 'localhost'); // Database hostname, default: localhost
 define('DB_USER', 'plantuser'); // Database username
-define('DB_PASS', 'password'); // Database password
+define('DB_PASS', 'redhammerbatterystapler'); // Database password
 define('DB_NAME', 'plantfriendsdb'); // Database name

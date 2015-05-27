@@ -19,7 +19,7 @@
 import MySQLdb as mdb
 
 ### Change the username, password and the database name accordingly
-con = mdb.connect('localhost', 'plantuser', 'password', 'plantfriendsdb');
+con = mdb.connect('localhost', 'plantuser', 'PASSWORD', 'plantfriendsdb');
 
 with con:
 

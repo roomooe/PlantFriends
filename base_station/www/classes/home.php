@@ -6,6 +6,9 @@
  * @link http://dicksonchow.com/plantfriends2
  * @license http://opensource.org/licenses/MIT MIT License
 */
+
+error_reporting(0);
+
 class Home {
 	private $dbconn = null;
 

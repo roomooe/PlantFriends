@@ -38,7 +38,9 @@ http://opensource.org/licenses/mit-license.php
 
 RFM69 radio;
 
-int LedPin = 9;
+int RedLedPin = 3;
+int GreenLedPin = 5;
+int BlueLedPin = 6;
 
 bool promiscuousMode = false; //set to 'true' to sniff all packets on the same network
 
@@ -48,10 +50,14 @@ void setup() {
   Serial.begin(SERIAL_BAUD);
   
   // LED
-  pinMode(LedPin, OUTPUT);
-  
-  LEDBlink(80);
-  LEDBlink(80);
+  pinMode(RedLedPin, OUTPUT);
+  pinMode(GreenLedPin, OUTPUT);
+  pinMode(BlueLedPin, OUTPUT);
+    
+  LEDBlink(500);
+  LEDBlink(500);
+  delay(3000);
+  LEDPulse();
   
   // initialize radio
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
@@ -65,8 +71,6 @@ void loop() {
   
   int datalen;
   char charbuf;
-  
-//  LEDPulse();
   
   if (radio.receiveDone()) // radio finishes recieving data
   {
@@ -85,12 +89,8 @@ void loop() {
         radio.sendACK();
         //Serial.print(" - ACK sent");
       }
-      
+      LEDPulse();   
       // blink led
-      LEDBlink(30);
-      LEDBlink(30);
-    
-      
   }
 }
 
@@ -100,26 +100,32 @@ void loop() {
 void LEDPulse() {
   int i;
   delay (12);
-  for (int i = 18; i < 128; i++) { // loop from 0 to 254 (fade in)
-    analogWrite(LedPin, i);      // set the LED brightness
-    delay(12);
+  for (int i = 0; i < 255; i++) { // loop from 0 to 254 (fade in)
+    analogWrite(RedLedPin, i/100);      // set the LED brightness
+    analogWrite(GreenLedPin, i/2);      // set the LED brightness
+    analogWrite(BlueLedPin, i);      // set the LED brightness
+    delay(10);
   }
 
-  for (int i = 128; i > 18; i--) { // loop from 255 to 1 (fade out)
-    analogWrite(LedPin, i); // set the LED brightness
-    delay(12);       
+  for (int i = 255; i > 0; i--) { // loop from 255 to 1 (fade out)
+    analogWrite(RedLedPin, i/100);      // set the LED brightness
+    analogWrite(GreenLedPin, i/2);      // set the LED brightness
+    analogWrite(BlueLedPin, i);      // set the LED brightness
+    
+    delay(10);       
   }
-  //digitalWrite(LedPin, LOW);
-  //delay (128);
+  digitalWrite(RedLedPin, LOW);
+  digitalWrite(GreenLedPin, LOW);
+  digitalWrite(BlueLedPin, LOW);
 }
 
 
 // LED Blink function
 void LEDBlink(int DELAY_MS)
 {
-  digitalWrite(LedPin,HIGH);
+  digitalWrite(RedLedPin,HIGH);
   delay(DELAY_MS);
-  digitalWrite(LedPin,LOW);
+  digitalWrite(RedLedPin,LOW);
   delay(DELAY_MS);
 }
 

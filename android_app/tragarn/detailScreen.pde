@@ -123,8 +123,8 @@ void detailScreen() {
   nName = nName.toUpperCase();
   text(nName, textMargin2, (272+74)*heightStretch);
 
-  // battery title
-  nName = "solljus";
+  // Water title
+  nName = "Vattennivå";
   nName = nName.toUpperCase();
   text(nName, textMargin2, (272+74+74)*heightStretch);
     
@@ -133,7 +133,11 @@ void detailScreen() {
 
   // soil moist data
   textFont(fontlit,46*heightStretch*1.5);
-  nName = NodeDetail[NodeIdex][dataDay][2]+ " %";
+  float moist = float(NodeDetail[NodeIdex][dataDay][2])-200;
+  
+  nName = nf((moist/900*100),0,-1) + " %";
+  // nName = nf((float(NodeDetail[NodeIdex][dataDay][2])/900*100),2,1) + " %";
+  // nName = NodeDetail[NodeIdex][dataDay][2]+ " %";
   nName = nName.toUpperCase();
   text(nName, dMargin, 204*heightStretch);
     
@@ -153,15 +157,16 @@ void detailScreen() {
   // warmth data
   text(nName, dMargin, (204+74+74)*heightStretch);
   
-  // battery data
-  nName = nf(float(NodeDetail[NodeIdex][dataDay][5]),1,2) + " %";
+  // water level data
+  
+  nName = nf((100-float(NodeDetail[NodeIdex][dataDay][5])/22*100),0,-1) + " %";
   text(nName, dMargin, (204+74+74+74)*heightStretch);
 
   // color legend
   float cMargin = 608*widthStretch;
 
   // soil moist
-  fill(brown);
+  fill(greengrass);
   rect(cMargin,180*heightStretch,46*widthStretch,14*heightStretch);
     
   // humid
@@ -172,8 +177,8 @@ void detailScreen() {
   fill(orangeredtemp);
   rect(cMargin,(180+74+74)*heightStretch,46*widthStretch,14*heightStretch);
 
-  // battery
-  fill(yellow);
+  // water level
+  fill(brown);
   rect(cMargin,(180+74+74+74)*heightStretch,46*widthStretch,14*heightStretch);
    
   popMatrix();
@@ -220,8 +225,8 @@ void detailScreen() {
   // draw the graph for each datatype. NodeIndex is global set and changed before entering the details screen. 
   //int datatype, int contLow, int contHigh, color gColor, int dGdot, int dGstroke, int gspace
   
-  // Soil Moisture graph. Mapped to 150 - 750 ADC value.
-  grapher(2,150,750,brown,14,3,gspace);
+  // Soil Moisture graph. Mapped to 150 - 900 ADC value.
+  grapher(2,250,900,greengrass,14,3,gspace);
 
   // humidity graph. Mapped to 0 - 90%
   grapher(4,0,90,bluesky,12,3,gspace);
@@ -229,8 +234,8 @@ void detailScreen() {
   // Temperature graph. Mapped to 0 - 49c.
   grapher(3,0,49,orangeredtemp,10,3,gspace);
   
-  // Battery voltage graph. Mapped to 3.3 - 6 volts.
-  grapher(5,3.3,6,yellow,8,3,gspace);
+  // water level graph. Mapped to 21 - 3 cm.
+  grapher(5,21,3,brown,8,3,gspace);
   
   popMatrix();
   popMatrix();
