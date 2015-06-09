@@ -109,7 +109,7 @@ void detailScreen() {
     
   // soil moist title
   textFont(fontmed,24*heightStretch*1.8);
-  nName = "jordfuktighet";
+  nName = "Jordfuktighet";
   nName = nName.toUpperCase();
   text(nName, textMargin2, 198*heightStretch);
     
@@ -119,15 +119,21 @@ void detailScreen() {
   text(nName, textMargin2, 272*heightStretch);
 
   // warmth title
-  nName = "temperatur";
+  nName = "Temperatur";
   nName = nName.toUpperCase();
   text(nName, textMargin2, (272+74)*heightStretch);
 
-  // Water title
-  nName = "Vattennivå";
-  nName = nName.toUpperCase();
-  text(nName, textMargin2, (272+74+74)*heightStretch);
-    
+  if (int(NodeIndex[NodeIdex][0])==2) {
+    // Water title
+    nName = "Vattennivå";
+    nName = nName.toUpperCase();
+    text(nName, textMargin2, (272+74+74)*heightStretch);
+  }
+  else {
+    nName = "Batteri";
+    nName = nName.toUpperCase();
+    text(nName, textMargin2, (272+74+74)*heightStretch);
+  }
   // data margin
   float dMargin = 390*widthStretch;
 
@@ -157,11 +163,16 @@ void detailScreen() {
   // warmth data
   text(nName, dMargin, (204+74+74)*heightStretch);
   
-  // water level data
-  
-  nName = nf((100-float(NodeDetail[NodeIdex][dataDay][5])/22*100),0,-1) + " %";
-  text(nName, dMargin, (204+74+74+74)*heightStretch);
-
+  if (int(NodeIndex[NodeIdex][0])==2) {
+    // water level data
+    nName = nf((100-float(NodeDetail[NodeIdex][dataDay][5])/22*100),0,-1) + " %";
+    text(nName, dMargin, (204+74+74+74)*heightStretch);
+  }
+  else {
+    // battery data
+    nName = nf((float(NodeDetail[NodeIdex][dataDay][5])/4.3*100),0,-1) + " %";
+    text(nName, dMargin, (204+74+74+74)*heightStretch);
+  }
   // color legend
   float cMargin = 608*widthStretch;
 

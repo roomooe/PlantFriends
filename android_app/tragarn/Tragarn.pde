@@ -54,8 +54,9 @@ float[][] nodeLib = {
 import ketai.ui.*;
 KetaiGesture gesture;
 
-// Server settings. Change IP address or hostname accordingly.
- static final String NodeIndexURL = "http://IP OF THE RASPBERRY";
+//  settings. Change IP address or hostname accordingly.
+ static final String NodeIndexURL = "http://IP_OF_RASPBERRY:PORT";
+
 
 
 // for accessing node specific data
@@ -232,7 +233,7 @@ float sum; // count to make sure splah image is done animating itself
 
 void setup() {
   // nexus 4 screen size sans bottom menu bar
- // size(540, 960);
+  // size(540, 960);
  
   // the hamburger way
   orientation(PORTRAIT);  

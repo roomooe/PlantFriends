@@ -53,11 +53,16 @@ void setup() {
   pinMode(RedLedPin, OUTPUT);
   pinMode(GreenLedPin, OUTPUT);
   pinMode(BlueLedPin, OUTPUT);
-    
+  
+  delay(1000);
   LEDBlink(500);
   LEDBlink(500);
-  delay(3000);
-  LEDPulse();
+  delay(1000);
+  LEDPulse(0);
+  delay(1000);
+  LEDPulse(1);
+  delay(1000);
+  LEDPulse(2);
   
   // initialize radio
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
@@ -71,6 +76,7 @@ void loop() {
   
   int datalen;
   char charbuf;
+  int nodeID;
   
   if (radio.receiveDone()) // radio finishes recieving data
   {
@@ -81,36 +87,45 @@ void loop() {
       // dumps data to the serial port
       Serial.print((char)radio.DATA[i]);
       Serial.println();
-      
      
       // sends ack to sensor node
       if (radio.ACKRequested())
       {
         radio.sendACK();
-        //Serial.print(" - ACK sent");
-      }
-      LEDPulse();   
+       
       // blink led
+      nodeID = radio.DATA[0]- '0'-2;
+      Serial.println(nodeID);
+ LEDPulse(nodeID); 
+ 
+      }
   }
 }
 
-
-
 // LED Pulse function
-void LEDPulse() {
+void LEDPulse(int a) {
+  
+  //define array for color pulses, (1/R, 1/G, 1/B)
+  float nodeRGBColor[3][3]={
+ {1,5,255},
+ {1,5,3},
+ {40,1,40}
+};
+
+
   int i;
   delay (12);
   for (int i = 0; i < 255; i++) { // loop from 0 to 254 (fade in)
-    analogWrite(RedLedPin, i/100);      // set the LED brightness
-    analogWrite(GreenLedPin, i/2);      // set the LED brightness
-    analogWrite(BlueLedPin, i);      // set the LED brightness
+    analogWrite(RedLedPin, i/(nodeRGBColor[a][0]));      // set the LED brightness
+    analogWrite(GreenLedPin, i/(nodeRGBColor[a][1]));      // set the LED brightness
+    analogWrite(BlueLedPin, i/(nodeRGBColor[a][2]));      // set the LED brightness
     delay(10);
   }
 
   for (int i = 255; i > 0; i--) { // loop from 255 to 1 (fade out)
-    analogWrite(RedLedPin, i/100);      // set the LED brightness
-    analogWrite(GreenLedPin, i/2);      // set the LED brightness
-    analogWrite(BlueLedPin, i);      // set the LED brightness
+    analogWrite(RedLedPin, i/(nodeRGBColor[a][0]));      // set the LED brightness
+    analogWrite(GreenLedPin, i/(nodeRGBColor[a][1]));      // set the LED brightness
+    analogWrite(BlueLedPin, i/(nodeRGBColor[a][2]));      // set the LED brightness
     
     delay(10);       
   }

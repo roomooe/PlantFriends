@@ -69,7 +69,7 @@ DHT dht(DHTPIN, DHTTYPE); // define DHT11
 #define VoltagePinEnable A3 // current sink pin. ( enable voltage divider )
 #define VoltageRef 3.3 // reference voltage on system. use to calculate voltage from ADC
 #define VoltageDivider 2 // if you have a voltage divider to read voltages, enter the multiplier here.
-int VoltageLow = 4; // low battery threshhold. 4 volts.
+int VoltageLow = 3.3; // low battery threshhold. 4 volts.
 int VoltageADC;
 
 
@@ -94,7 +94,7 @@ int VoltageADC;
 
 
 // Power Management Sleep cycles
-int sleepCycledefault = 4; // Sleep cycle 450*8 seconds = 1 hour. DEFAULT 450
+int sleepCycledefault = 450; // Sleep cycle 450*8 seconds = 1 hour. DEFAULT 450
 int soilMoistThresh = 250; // soil moisture threshold. reference chart
 
 

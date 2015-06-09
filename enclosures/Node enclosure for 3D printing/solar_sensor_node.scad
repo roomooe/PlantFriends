@@ -8,14 +8,14 @@
 // Added provision for mounting tabs
 
 // Revise your paths to libary where these openSCAD library modules are located
-use <E:\printer\div\Generic_case_and_lid_-_improved\teardrops.scad>
-use <E:\printer\div\Generic_case_and_lid_-_improved\roundCornersCube.scad>
-use <E:\printer\div\Generic_case_and_lid_-_improved\polyhole.scad>
+use <E:\PlantFriends\enclosures\Node enclosure for 3D printing\teardrops.scad>
+use <E:\PlantFriends\enclosures\Node enclosure for 3D printing\roundCornersCube.scad>
+use <E:\PlantFriends\enclosures\Node enclosure for 3D printing\polyhole.scad>
 // Summary of external modules used - 
 // polyhole(h,d) provides improved size control on small holes
 // roundCornersCube (x,y,z,r)
 
-module standoff( post_od , post_id , post_h , hole_depth) {
+module standoff( post_od , post_id , post_h , hole_depth, h_lift) {
   // Generates a standoff for mounting lid or circuit board
   // post_od: outer diamter of the standoff post
   // post_id: diameter of the inner hole in the standoff post
@@ -23,9 +23,9 @@ module standoff( post_od , post_id , post_h , hole_depth) {
   // hole_depth: depth of the inner hole in the standoff post
   difference() {
     // start with a solid post
-    cylinder( d = post_od , h = post_h , $fs=0.01);
+    cylinder( d = post_od , h = post_h-h_lift , $fs=0.01);
     // remove the hole for the screw
-    translate([ 0 , 0 , post_h - hole_depth ])
+    translate([ 0 , 0 , post_h - hole_depth -h_lift ])
       polyhole( hole_depth + 1 , post_id ); 
   }  // end difference
 }  // end module standoff
@@ -58,8 +58,8 @@ module rounded_cube_case (generate_box, generate_lid) {
   // If used, mounting tabs are always added on X axis ends
 
   // Case parameters for tailoring  
-  sx = 75; 			     // box outer size in X axis
-  sy = 52;			     // box outer size in Y axis
+  sx = 77; 			     // box outer size in X axis
+  sy = 61;			     // box outer size in Y axis
   sz = 28;				  // box outer size in Z axis, including top and bottom
   box_r = 2.5;			  // radius of the box corners
   wall_t = 2;       // wall thickenss for the box and lid should be < box_hole_dia
@@ -67,10 +67,11 @@ module rounded_cube_case (generate_box, generate_lid) {
 
   // Box and lid screw hole parameters for tailoring
   box_hole_dia = 2.4;  // diameter of the screw hole in the box part (2.4 for #4)
-  box_hole_depth = 10; // depth of the screw hole must be < box height
+  box_hole_depth = 7; // depth of the screw hole must be < box height
   lid_hole_dia = 3.2;  // diameter of the screw hole in the lid part (3.2 for #4)
   lid_head_dia = 5.5;  // diameter of the screw head recess (5.5 for #4)
   lid_head_depth = 0;  // depth of head recess (only use if wall_t can accomodate it)
+  h_lift = 15;         // lift height for corner hole support, add support when printing if this is used
 
   // Mounting tab parameters for tailoring
   tab_w = 8;           // mounting tab width 
@@ -112,39 +113,36 @@ module rounded_cube_case (generate_box, generate_lid) {
           roundCornersCube( sx - (wall_t*2) , sy - (wall_t*2) , sz, box_r );
 
         // Define any holes in the box walls here
-        translate([5, 23, 11+wall_t])
+        translate([5, 23, 10+wall_t])
           roundCornersCube(15,10,6);
-        translate([70, 42, 11+wall_t])
+        translate([70, 15, 10+wall_t])
           rotate([0,90,0])
-          cylinder(h=10, r=4, $fn=20);
+          cylinder(h=10, r=4.5, $fn=20);
            translate([32, 22.7, 0])
-          cylinder(h=10, r=2.5, $fn=20);
+          cylinder(h=10, r=3, $fn=20);
         translate([62, 22.7, 0])
           roundCornersCube(17,14,5);
        
-       translate([75, 14.5, 11+wall_t])
-          roundCornersCube(19,10,6);
-       translate([75, 31, 11+wall_t])
-          roundCornersCube(19,10,6);
+
           
       }  // End difference
 			
       // Add the standoff posts for the lid screws in each corner
       for (i = lid_hole_centres) {
-        translate([ 0 , 0 , wall_t ])  // raise up to the inside of the box
+        translate([ 0 , 0 , wall_t+h_lift])  // raise up to the inside of the box
           translate(i)                 // locate a corner
-            standoff( corner_post_dia , box_hole_dia , sz - (wall_t * 2) , box_hole_depth );
+            standoff( corner_post_dia , box_hole_dia , sz - (wall_t * 2) , box_hole_depth , h_lift );
       }  // end for loop
 
       // Add any mounting standoff posts on the box bottom here
       translate([5,10,wall_t/2])
-      standoff(4,2,5,4);
+      standoff(4,2,5,4,0);
       translate([70,10,wall_t/2])
-      standoff(4,2,5,4);
+      standoff(4,2,5,4,0);
       translate([5,35,wall_t/2])
-      standoff(4,2,5,4);
+      standoff(4,2,5,4,0);
       translate([70,35,wall_t/2])
-      standoff(4,2,5,4);
+      standoff(4,2,5,4,0);
       // Add mounting tab if needed
       if ( use_tab == true ) {
         difference () {
@@ -231,5 +229,5 @@ module rounded_cube_case (generate_box, generate_lid) {
 
 // Here's the top level geometry
 // Edit true or false for obtaining box and lid respectively
-rounded_cube_case(false, true);
+rounded_cube_case(true, true);
 

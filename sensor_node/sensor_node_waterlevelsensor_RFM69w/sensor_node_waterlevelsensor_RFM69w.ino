@@ -42,7 +42,6 @@ Soil Moisture Chart
 
 */
 
-
 // Include libraries
 #include <DHT.h> // DHT sensor library
 #include <LowPower.h> // low power library
@@ -56,13 +55,11 @@ Soil Moisture Chart
 #define moistPIN2 7 // soil probe pin 2 with 100ohm resistor
 #define moistREADPIN1 A0 // analog read pin. connected to A2 PIN with 56kohm resistor
 
-
 // DHT Humidity + Temperature sensor define
 #define DHTPIN 5 // Data pin (D5) for DHT
 #define DHTPWR 4 // turn DHT on and off via transistor
 #define DHTTYPE DHT11 // sensor model DHT11
 DHT dht(DHTPIN, DHTTYPE); // define DHT11
-
 
 // Water level meter 
 #define trigPin 8 // analogue voltage read pin for batery meter
@@ -70,19 +67,16 @@ DHT dht(DHTPIN, DHTTYPE); // define DHT11
 #define VoltageDivider 2 // if you have a voltage divider to read voltages, enter the multiplier here.
 
 //Water pump pin
-#define waterPumpPin 10
-
-
+#define waterPumpPin 3
 
 // LED Pin
 #define led 6
-
 
 // RADIO SETTINGS
 // You will need to initialize the radio by telling it what ID it has and what network it's on
 // The NodeID takes values from 1-127, 0 is reserved for sending broadcast messages (send to all nodes)
 // The Network ID takes values from 0-255
-#define NODEID       3  // The ID of this node. Has to be unique. 1 is reserved for the gateway!
+#define NODEID       2  // The ID of this node. Has to be unique. 1 is reserved for the gateway!
 #define NETWORKID    20  //the network ID we are on
 #define GATEWAYID     1  //the gateway Moteino ID (default is 1)
 #define ACK_TIME     2800  // # of ms to wait for an ack
@@ -92,21 +86,17 @@ DHT dht(DHTPIN, DHTTYPE); // define DHT11
 //#define FREQUENCY     RF69_915MHZ
 // #define ENCRYPTKEY    "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
 
-
-
 // Power Management Sleep cycles
-int sleepCycledefault = 1; // Sleep cycle 450*8 seconds = 1 hour. DEFAULT 450
+int sleepCycledefault = 450; // Sleep cycle 450*8 seconds = 1 hour. DEFAULT 450
 int soilMoistThresh = 250; // soil moisture threshold. reference chart
 long minWaterLevel = 21; // Water level threshold, dependant on water tank
 
 String senseDATA; // sensor data STRING
 String ErrorLvl = "0"; // Error level. 0 = normal. 1 = soil moisture, 2 = Temperature , 3 = Humidity, 4 = Battery voltage
 
-
 // Need an instance of the Radio Module
 RFM69 radio;
 bool requestACK=true;
-
 
 void setup()
 {
@@ -289,11 +279,18 @@ void LEDBlink(int DELAY_MS)
 // Watering function
 void watering () {
 
-
     digitalWrite(waterPumpPin, HIGH);
-    delay(1000);
+    delay(5000);
+    analogWrite(waterPumpPin, 200);
+    delay(5000);
+    analogWrite(waterPumpPin, 150);
+    delay(5000);
+    analogWrite(waterPumpPin, 100);
+    delay(5000);
+    analogWrite(waterPumpPin, 50);
+    delay(5000);
     digitalWrite(waterPumpPin, LOW);
-    delay(1000);
+    delay(60000);
     
     
     

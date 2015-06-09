@@ -41,7 +41,7 @@ import MySQLdb as mdb # interact with MySQL
 
 
 # Declare database variables. Change accordingly
-con = mdb.connect('localhost', 'plantuser', 'redhammerbatterystapler', 'plantfriendsdb');
+con = mdb.connect('localhost', 'plantuser', 'PASSWORD', 'plantfriendsdb');
 
 
 # Information for email. This will be used by the Plant Friends system to send out emails.
